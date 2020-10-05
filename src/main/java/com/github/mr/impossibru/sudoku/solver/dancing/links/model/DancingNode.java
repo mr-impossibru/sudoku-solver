@@ -17,11 +17,11 @@ public class DancingNode {
 
     protected DancingNode down;
 
-    protected ColumnDancingNode head;
+    protected ColumnDancingNode column;
 
-    public DancingNode(ColumnDancingNode head) {
+    public DancingNode(ColumnDancingNode column) {
         this();
-        this.head = head;
+        this.column = column;
     }
 
     public DancingNode() {

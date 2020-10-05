@@ -10,31 +10,32 @@ import java.util.Stack;
 public class DLX {
 
     private ColumnDancingNode header;
-    private List<DancingNode> result;
+    private final List<List<DancingNode>> result;
     private final Stack<DancingNode> stack;
 
     public DLX(boolean[][] exactCoverBoard) {
-        int columnsNumber = exactCoverBoard[0].length;
-        //FIXME: change to array?
-        final List<ColumnDancingNode> columns = new ArrayList<>(columnsNumber);
+        final int columnsNumber = exactCoverBoard[0].length;
+        final ColumnDancingNode[] columns = new  ColumnDancingNode[columnsNumber];
+        result = new ArrayList<>();
         stack = new Stack<>();
-        header = new ColumnDancingNode("h");
+        header = new ColumnDancingNode("head");
 
         //link columns to header
         for (int i = 0; i < columnsNumber; i++) {
             ColumnDancingNode column = new ColumnDancingNode(Integer.toString(i));
-            columns.add(column);
+            columns[i] = column;
             header = (ColumnDancingNode) header.addRight(column);
         }
         //set header node
-        header = header.getRight().getHead();
+        header = header.getRight().getColumn();
 
+        //add nodes to columns
         for (boolean[] row : exactCoverBoard) {
             DancingNode previous = null;
             for (int i = 0; i < columnsNumber; i++) {
                 boolean cell = row[i];
                 if (cell) {
-                    ColumnDancingNode column = columns.get(i);
+                    ColumnDancingNode column = columns[i];
                     DancingNode node = new DancingNode(column);
                     column.getUp().addDown(node);
                     column.incrementSize();
@@ -46,9 +47,9 @@ public class DLX {
         header.setSize(columnsNumber);
     }
 
-    public List<DancingNode> runAlgorithmX() {
+    public List<List<DancingNode>> runAlgorithmX() {
         if (header == header.getRight()) {
-            result = new ArrayList<>(stack);
+            result.add(new ArrayList<>(stack));
         } else {
             ColumnDancingNode column = selectColumn();
             column.cover();
@@ -57,15 +58,15 @@ public class DLX {
                 stack.push(columnDownNode);
 
                 for (DancingNode node = columnDownNode.getRight(); node != columnDownNode; node = node.getRight()) {
-                    node.getHead().cover();
+                    node.getColumn().cover();
                 }
 
                 runAlgorithmX();
                 DancingNode poppedNode = stack.pop();
-                column = poppedNode.getHead();
+                column = poppedNode.getColumn();
 
                 for (DancingNode node = poppedNode.getLeft(); node != poppedNode; node = node.getLeft()) {
-                    node.getHead().discover();
+                    node.getColumn().discover();
                 }
             }
 
@@ -75,6 +76,10 @@ public class DLX {
         return result;
     }
 
+    /**
+     * Selects column with minimal number of nodes
+     * @return column node
+     */
     private ColumnDancingNode selectColumn() {
         ColumnDancingNode result = null;
         int minSize = Integer.MAX_VALUE;
@@ -90,7 +95,5 @@ public class DLX {
 
         return result;
     }
-
-
 
 }

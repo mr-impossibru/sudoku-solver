@@ -17,24 +17,30 @@ public class ColumnDancingNode extends DancingNode {
     public ColumnDancingNode(String name) {
         super();
         this.name = name;
-        head = this;
+        column = this;
     }
 
+    /**
+     * Covers column and rows which intersect with column nodes.
+     */
     public void cover() {
         removeFromRow();
         for (DancingNode row = down; row != this; row = row.getDown()) {
             for (DancingNode node = row.getRight(); node != row; node = node.getRight()) {
                 node.removeFromColumn();
-                node.getHead().decrementSize();
+                node.getColumn().decrementSize();
             }
         }
     }
 
+    /**
+     * Discovers column and rows which intersect with column nodes.
+     */
     public void discover() {
         for (DancingNode row = down; row != this; row = row.getDown()) {
             for (DancingNode node = row.getRight(); node != row; node = node.getRight()) {
                 node.putToColumn();
-                node.getHead().incrementSize();
+                node.getColumn().incrementSize();
             }
         }
 

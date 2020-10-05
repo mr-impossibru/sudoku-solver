@@ -3,18 +3,25 @@ package com.github.mr.impossibru.sudoku.solver.dancing.links;
 import com.github.mr.impossibru.sudoku.solver.SudokuSolver;
 import com.github.mr.impossibru.sudoku.solver.dancing.links.model.DancingNode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class DancingLinksSudokuSolver implements SudokuSolver {
 
     /**
-     * Size of the board side
+     * Size of the board side.
      */
     private final int boardSide;
 
+    /**
+     * Max number in sudoku board, equals size of board side.
+     */
     private final int maxNumber;
 
+    /**
+     * Size of sector side (square root of board side).
+     */
     private final int sectorSide;
 
     /**
@@ -37,13 +44,19 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
         this.sectorSide = (int) Math.rint(Math.sqrt(boardSide));
     }
 
+    /**
+     * Solves sudoku using Dancing Links Algorithm
+     *
+     * @param initialState initial state of sudoku board
+     * @return solved sudoku board
+     */
     @Override
-    public int[][] solve(int[][] initialState) {
+    public List<Integer[][]> solve(int[][] initialState) {
         boolean[][] coverBoard = createCoverBoard();
         putInitialStateToCoverBoard(initialState, coverBoard);
 
         DLX dlx = new DLX(coverBoard);
-        List<DancingNode> dancingNodes = dlx.runAlgorithmX();
+        List<List<DancingNode>> dancingNodes = dlx.runAlgorithmX();
 
         return transformAnswerToSudokuGrid(dancingNodes);
     }
@@ -52,34 +65,22 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
         return (candidate - 1) + (row - 1) * boardSide * boardSide + (col - 1) * boardSide;
     }
 
-    private void putInitialStateToCoverBoard(int[][] initialState, boolean[][] coverBoard) {
-        for (int col = 1; col <= boardSide; col++) {
-            for (int row = 1; row <= boardSide; row++) {
-                int value = initialState[row - 1][col - 1];
-                if (value != 0) {
-                    for (int candidate = 1; candidate <= maxNumber; candidate++) {
-                        if (candidate != value) {
-                            Arrays.fill(
-                                    coverBoard[getCoverBoardRowIndex(candidate, row, col)],
-                                    false
-                            );
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Creates exact cover board.
-     * Rows - each possible number in each cells.
-     * Columns - each constraint for candidate (number / row / column).
+     * Rows - each possible number in each cells (candidate)
+     * Columns - each constraint for candidate.
      *
      * @return cover board
      */
     private boolean[][] createCoverBoard() {
-        // add 1 for header column
         boolean[][] coverBoard = new boolean[boardSide * boardSide * boardSide][boardSide * boardSide * CONSTRAINTS];
+        /*
+            Index of constraint column. For 4x4 board:
+            0 - 15 - cell constraint
+            16 - 31 - row constraint
+            32 - 47 - column constraint
+            48 - 63 - sector constraint
+         */
         int constraintColIndex = -1;
         constraintColIndex = fillCellConstraint(coverBoard, constraintColIndex);
         constraintColIndex = fillRowConstraint(coverBoard, constraintColIndex);
@@ -149,35 +150,64 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
 
         return constraintColIndex;
     }
-    
-    public int[][] transformAnswerToSudokuGrid(List<DancingNode> nodes) {
-        int[][] result = new int[boardSide][boardSide];
 
-        for (DancingNode node : nodes) {
-            DancingNode rcNode = node;
-            
-            int min = Integer.parseInt(rcNode.getHead().getName());
-
-            for (DancingNode rightNode = node.getRight(); rightNode != node; rightNode = rightNode.getRight()) {
-                int value = Integer.parseInt(rightNode.getHead().getName());
-
-                if (value < min) {
-                    min = value;
-                    rcNode = rightNode;
+    /**
+     * Takes initial state and updates cover board - removes other possible rows for this cell.
+     *
+     * @param initialState initial state of sudoku board
+     * @param coverBoard   exact cover board
+     */
+    private void putInitialStateToCoverBoard(int[][] initialState, boolean[][] coverBoard) {
+        for (int col = 1; col <= boardSide; col++) {
+            for (int row = 1; row <= boardSide; row++) {
+                int value = initialState[row - 1][col - 1];
+                if (value != 0) {
+                    for (int candidate = 1; candidate <= maxNumber; candidate++) {
+                        if (candidate != value) {
+                            Arrays.fill(
+                                    coverBoard[getCoverBoardRowIndex(candidate, row, col)],
+                                    false
+                            );
+                        }
+                    }
                 }
             }
-
-            //TODO rename
-            int ans1 = Integer.parseInt(rcNode.getHead().getName());
-            int ans2 = Integer.parseInt(rcNode.getRight().getHead().getName());
-
-            int rowIndex = ans1 / boardSide;
-            int colIndex = ans1 % boardSide;
-
-            int num = (ans2 % boardSide) + 1;
-
-            result[rowIndex][colIndex] = num;
         }
+    }
+
+    public List<Integer[][]> transformAnswerToSudokuGrid(List<List<DancingNode>> solutions) {
+        List<Integer[][]> result = new ArrayList<>();
+        for (List<DancingNode> solution : solutions) {
+            Integer[][] solvedBoard = new Integer[boardSide][boardSide];
+
+            for (DancingNode node : solution) {
+                DancingNode rcNode = node;
+
+                int min = Integer.parseInt(rcNode.getColumn().getName());
+
+                for (DancingNode rightNode = node.getRight(); rightNode != node; rightNode = rightNode.getRight()) {
+                    int value = Integer.parseInt(rightNode.getColumn().getName());
+
+                    if (value < min) {
+                        min = value;
+                        rcNode = rightNode;
+                    }
+                }
+
+                //TODO rename
+                int ans1 = Integer.parseInt(rcNode.getColumn().getName());
+                int ans2 = Integer.parseInt(rcNode.getRight().getColumn().getName());
+
+                int rowIndex = ans1 / boardSide;
+                int colIndex = ans1 % boardSide;
+
+                int num = (ans2 % boardSide) + 1;
+
+                solvedBoard[rowIndex][colIndex] = num;
+            }
+            result.add(solvedBoard);
+        }
+
 
         return result;
     }
