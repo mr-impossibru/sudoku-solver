@@ -1,9 +1,9 @@
 package com.github.mr.impossibru.sudoku.solver.dancing.links;
 
 import com.github.mr.impossibru.sudoku.solver.SudokuSolver;
+import com.github.mr.impossibru.sudoku.solver.Util;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -30,7 +30,7 @@ class DancingLinksSudokuSolverTest {
 
         sudokuSolver = new DancingLinksSudokuSolver(initialState.length);
         List<Integer[][]> actual = sudokuSolver.solve(initialState);
-        printSudokuBoard(actual);
+        Util.printSudokuBoard(actual);
         assertEquals(1, actual.size());
         assertArrayEquals(expected, actual.get(0));
     }
@@ -64,7 +64,7 @@ class DancingLinksSudokuSolverTest {
 
         sudokuSolver = new DancingLinksSudokuSolver(initialState.length);
         List<Integer[][]> actual = sudokuSolver.solve(initialState);
-        printSudokuBoard(actual);
+        Util.printSudokuBoard(actual);
         assertEquals(3, actual.size());
         assertArrayEquals(expectedFirst, actual.get(0));
         assertArrayEquals(expectedSecond, actual.get(1));
@@ -83,7 +83,7 @@ class DancingLinksSudokuSolverTest {
         sudokuSolver = new DancingLinksSudokuSolver(initialState.length);
         List<Integer[][]> actual = sudokuSolver.solve(initialState);
         assertEquals(288, actual.size());
-        printSudokuBoard(actual);
+        Util.printSudokuBoard(actual);
     }
 
     @Test
@@ -113,20 +113,9 @@ class DancingLinksSudokuSolverTest {
 
         sudokuSolver = new DancingLinksSudokuSolver(initialState.length);
         List<Integer[][]> actual = sudokuSolver.solve(initialState);
-        printSudokuBoard(actual);
+        Util.printSudokuBoard(actual);
         assertEquals(1, actual.size());
         assertArrayEquals(expected, actual.get(0));
     }
-
-    private void printSudokuBoard(List<Integer[][]> solutions) {
-        System.out.println("Total solutions - " + solutions.size());
-        for (int i = 0; i < solutions.size(); i++) {
-            System.out.println("Solution #" + i);
-            for (Integer[] row : solutions.get(i)) {
-                System.out.println(Arrays.toString(row));
-            }
-        }
-    }
-
-
+    
 }
