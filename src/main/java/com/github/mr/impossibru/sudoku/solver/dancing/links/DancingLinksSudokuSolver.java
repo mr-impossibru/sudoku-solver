@@ -2,6 +2,9 @@ package com.github.mr.impossibru.sudoku.solver.dancing.links;
 
 import com.github.mr.impossibru.sudoku.solver.SudokuSolver;
 import com.github.mr.impossibru.sudoku.solver.dancing.links.model.DancingNode;
+import com.github.mr.impossibru.sudoku.solver.model.SudokuBoard;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,20 +12,9 @@ import java.util.List;
 
 public class DancingLinksSudokuSolver implements SudokuSolver {
 
-    /**
-     * Size of the board side.
-     */
-    private final int boardSide;
-
-    /**
-     * Max number in sudoku board, equals size of board side.
-     */
-    private final int maxNumber;
-
-    /**
-     * Size of sector side (square root of board side).
-     */
-    private final int sectorSide;
+    @Getter
+    @Setter
+    private SudokuBoard board;
 
     /**
      * Number of constraints:
@@ -36,12 +28,10 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
     /**
      * Initialize Sudoku Solver based on Algorithm X
      *
-     * @param boardSide size of sudoku board side
+     * @param board initial Sudoku Board
      */
-    public DancingLinksSudokuSolver(int boardSide) {
-        this.boardSide = boardSide;
-        this.maxNumber = boardSide;
-        this.sectorSide = (int) Math.rint(Math.sqrt(boardSide));
+    public DancingLinksSudokuSolver(SudokuBoard board) {
+        this.board = board;
     }
 
     /**
@@ -62,7 +52,7 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
     }
 
     private int getCoverBoardRowIndex(int candidate, int row, int col) {
-        return (candidate - 1) + (row - 1) * boardSide * boardSide + (col - 1) * boardSide;
+        return (candidate - 1) + (row - 1) * board.getSide() * board.getSide() + (col - 1) * board.getSide();
     }
 
     /**
@@ -73,7 +63,7 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
      * @return cover board
      */
     private boolean[][] createCoverBoard() {
-        boolean[][] coverBoard = new boolean[boardSide * boardSide * boardSide][boardSide * boardSide * CONSTRAINTS];
+        boolean[][] coverBoard = new boolean[board.getSide() * board.getSide() * board.getSide()][board.getSide() * board.getSide() * CONSTRAINTS];
         /*
             Index of constraint column. For 4x4 board:
             0 - 15 - cell constraint
@@ -91,10 +81,10 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
     }
 
     private int fillCellConstraint(boolean[][] coverBoard, int constraintColIndex) {
-        for (int row = 1; row <= boardSide; row++) {
-            for (int column = 1; column <= boardSide; column++) {
+        for (int row = 1; row <= board.getSide(); row++) {
+            for (int column = 1; column <= board.getSide(); column++) {
                 constraintColIndex++;
-                for (int candidate = 1; candidate <= maxNumber; candidate++) {
+                for (int candidate = 1; candidate <= board.getMaxNumber(); candidate++) {
                     coverBoard[getCoverBoardRowIndex(candidate, row, column)][constraintColIndex] = true;
                 }
             }
@@ -104,10 +94,10 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
     }
 
     private int fillRowConstraint(boolean[][] coverBoard, int constraintColIndex) {
-        for (int row = 1; row <= boardSide; row++) {
-            for (int candidate = 1; candidate <= maxNumber; candidate++) {
+        for (int row = 1; row <= board.getSide(); row++) {
+            for (int candidate = 1; candidate <= board.getMaxNumber(); candidate++) {
                 constraintColIndex++;
-                for (int column = 1; column <= boardSide; column++) {
+                for (int column = 1; column <= board.getSide(); column++) {
                     coverBoard[getCoverBoardRowIndex(candidate, row, column)][constraintColIndex] = true;
                 }
             }
@@ -117,10 +107,10 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
     }
 
     private int fillColumnConstraint(boolean[][] coverBoard, int constraintColIndex) {
-        for (int column = 1; column <= boardSide; column++) {
-            for (int candidate = 1; candidate <= maxNumber; candidate++) {
+        for (int column = 1; column <= board.getSide(); column++) {
+            for (int candidate = 1; candidate <= board.getMaxNumber(); candidate++) {
                 constraintColIndex++;
-                for (int row = 1; row <= boardSide; row++) {
+                for (int row = 1; row <= board.getSide(); row++) {
                     coverBoard[getCoverBoardRowIndex(candidate, row, column)][constraintColIndex] = true;
                 }
             }
@@ -130,12 +120,12 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
     }
 
     private int fillSectorConstraint(boolean[][] coverBoard, int constraintColIndex) {
-        for (int row = 1; row <= boardSide; row += sectorSide) {
-            for (int column = 1; column <= boardSide; column += sectorSide) {
-                for (int candidate = 1; candidate <= maxNumber; candidate++) {
+        for (int row = 1; row <= board.getSide(); row += board.getSectorSide()) {
+            for (int column = 1; column <= board.getSide(); column += board.getSectorSide()) {
+                for (int candidate = 1; candidate <= board.getMaxNumber(); candidate++) {
                     constraintColIndex++;
-                    for (int sectorRow = 0; sectorRow < sectorSide; sectorRow++) {
-                        for (int sectorCol = 0; sectorCol < sectorSide; sectorCol++) {
+                    for (int sectorRow = 0; sectorRow < board.getSectorSide(); sectorRow++) {
+                        for (int sectorCol = 0; sectorCol < board.getSectorSide(); sectorCol++) {
                             int rowIndex = getCoverBoardRowIndex(
                                     candidate,
                                     row + sectorRow,
@@ -158,11 +148,11 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
      * @param coverBoard   exact cover board
      */
     private void putInitialStateToCoverBoard(int[][] initialState, boolean[][] coverBoard) {
-        for (int col = 1; col <= boardSide; col++) {
-            for (int row = 1; row <= boardSide; row++) {
+        for (int col = 1; col <= board.getSide(); col++) {
+            for (int row = 1; row <= board.getSide(); row++) {
                 int value = initialState[row - 1][col - 1];
                 if (value != 0) {
-                    for (int candidate = 1; candidate <= maxNumber; candidate++) {
+                    for (int candidate = 1; candidate <= board.getMaxNumber(); candidate++) {
                         if (candidate != value) {
                             Arrays.fill(
                                     coverBoard[getCoverBoardRowIndex(candidate, row, col)],
@@ -178,7 +168,7 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
     public List<Integer[][]> transformAnswerToSudokuGrid(List<List<DancingNode>> solutions) {
         List<Integer[][]> result = new ArrayList<>();
         for (List<DancingNode> solution : solutions) {
-            Integer[][] solvedBoard = new Integer[boardSide][boardSide];
+            Integer[][] solvedBoard = new Integer[board.getSide()][board.getSide()];
 
             for (DancingNode node : solution) {
                 DancingNode rcNode = node;
@@ -198,10 +188,10 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
                 int ans1 = Integer.parseInt(rcNode.getColumn().getName());
                 int ans2 = Integer.parseInt(rcNode.getRight().getColumn().getName());
 
-                int rowIndex = ans1 / boardSide;
-                int colIndex = ans1 % boardSide;
+                int rowIndex = ans1 / board.getSide();
+                int colIndex = ans1 % board.getSide();
 
-                int num = (ans2 % boardSide) + 1;
+                int num = (ans2 % board.getSide()) + 1;
 
                 solvedBoard[rowIndex][colIndex] = num;
             }
