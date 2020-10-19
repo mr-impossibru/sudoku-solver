@@ -9,7 +9,7 @@ import java.util.Stack;
 
 public class DLX {
 
-    private ColumnDancingNode header;
+    private ColumnDancingNode root;
     private final List<List<DancingNode>> result;
     private final Stack<DancingNode> stack;
 
@@ -18,16 +18,16 @@ public class DLX {
         final ColumnDancingNode[] columns = new  ColumnDancingNode[columnsNumber];
         result = new ArrayList<>();
         stack = new Stack<>();
-        header = new ColumnDancingNode("head");
+        root = new ColumnDancingNode("root");
 
-        //link columns to header
+        //link columns to root
         for (int i = 0; i < columnsNumber; i++) {
             ColumnDancingNode column = new ColumnDancingNode(Integer.toString(i));
             columns[i] = column;
-            header = (ColumnDancingNode) header.addRight(column);
+            root = (ColumnDancingNode) root.addRight(column);
         }
-        //set header node
-        header = header.getRight().getColumn();
+        //set root node
+        root = root.getRight().getColumn();
 
         //add nodes to columns
         for (boolean[] row : exactCoverBoard) {
@@ -44,16 +44,21 @@ public class DLX {
             }
         }
 
-        header.setSize(columnsNumber);
+        root.setSize(columnsNumber);
     }
 
     public List<List<DancingNode>> runAlgorithmX() {
-        if (header == header.getRight()) {
+        if (root == root.getRight()) {
             result.add(new ArrayList<>(stack));
         } else {
             ColumnDancingNode column = selectColumn();
             column.cover();
 
+            // pick node from selected column
+            // add it to solutions stack
+            // cover columns, which are linked to selected row
+            // run Algo X again
+            // pop from stack and discover columns to try another combination
             for (DancingNode columnDownNode = column.getDown(); columnDownNode != column; columnDownNode = columnDownNode.getDown()) {
                 stack.push(columnDownNode);
 
@@ -62,6 +67,7 @@ public class DLX {
                 }
 
                 runAlgorithmX();
+
                 DancingNode poppedNode = stack.pop();
                 column = poppedNode.getColumn();
 
@@ -77,15 +83,15 @@ public class DLX {
     }
 
     /**
-     * Selects column with minimal number of nodes
+     * Selects column with minimal number of nodes -> less possible variations
      * @return column node
      */
     private ColumnDancingNode selectColumn() {
         ColumnDancingNode result = null;
         int minSize = Integer.MAX_VALUE;
 
-        for (ColumnDancingNode node = (ColumnDancingNode) header.getRight();
-             node != header;
+        for (ColumnDancingNode node = (ColumnDancingNode) root.getRight();
+             node != root;
              node = (ColumnDancingNode) node.getRight()) {
             if (node.getSize() < minSize) {
                 minSize = node.getSize();

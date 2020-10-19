@@ -1,15 +1,18 @@
 package com.github.mr.impossibru.sudoku.solver.iterative;
 
+import com.github.mr.impossibru.sudoku.solver.SudokuSolver;
 import com.github.mr.impossibru.sudoku.solver.util.SudokuUtil;
-import com.github.mr.impossibru.sudoku.solver.model.SudokuBoard;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class IterativeSudokuSolverTest {
 
-    IterativeSudokuSolver sudokuSolver;
+    SudokuSolver sudokuSolver;
 
     @Test
     void sudoku_4x4_OneSolution() {
@@ -19,17 +22,18 @@ class IterativeSudokuSolverTest {
                 {1, 3, 4, 2},
                 {2, 4, 3, 1},
         };
-        int[][] expected = {
+        Integer[][] expected = {
                 {4, 2, 1, 3},
                 {3, 1, 2, 4},
                 {1, 3, 4, 2},
                 {2, 4, 3, 1},
         };
 
-        sudokuSolver = new IterativeSudokuSolver(new SudokuBoard(initialState));
-        sudokuSolver.solve();
-        SudokuUtil.printSudokuBoard(sudokuSolver.getSudoku().getBoard());
-        assertArrayEquals(expected, sudokuSolver.getSudoku().getBoard());
+        sudokuSolver = new IterativeSudokuSolver();
+        List<Integer[][]> actual = sudokuSolver.solve(initialState);
+        SudokuUtil.printSudokuBoard(actual);
+        assertEquals(1, actual.size());
+        assertArrayEquals(expected, actual.get(0));
     }
 
     @Test
@@ -45,7 +49,7 @@ class IterativeSudokuSolverTest {
                 {0, 0, 8, 5, 0, 0, 0, 1, 0},
                 {0, 9, 0, 0, 0, 0, 4, 0, 0}
         };
-        int[][] expected = {
+        Integer[][] expected = {
                 {8, 1, 2, 7, 5, 3, 6, 4, 9},
                 {9, 4, 3, 6, 8, 2, 1, 7, 5},
                 {6, 7, 5, 4, 9, 1, 2, 8, 3},
@@ -57,10 +61,11 @@ class IterativeSudokuSolverTest {
                 {7, 9, 6, 3, 1, 8, 4, 5, 2}
         };
 
-        sudokuSolver = new IterativeSudokuSolver(new SudokuBoard(initialState));
-        sudokuSolver.solve();
-        SudokuUtil.printSudokuBoard(sudokuSolver.getSudoku().getBoard());
-        assertArrayEquals(expected, sudokuSolver.getSudoku().getBoard());
+        sudokuSolver = new IterativeSudokuSolver();
+        List<Integer[][]> actual = sudokuSolver.solve(initialState);
+        SudokuUtil.printSudokuBoard(actual);
+        assertEquals(1, actual.size());
+        assertArrayEquals(expected, actual.get(0));
     }
 
     @Test
@@ -87,7 +92,7 @@ class IterativeSudokuSolverTest {
                 { 6, 14,  0,  0, /**/  0, 11,  0,  2, /**/  0,  8,  0, 13, /**/ 12,  0,  0, 15},
         };
 
-        int[][] expected = {
+        Integer[][] expected = {
                 { 1,  5, 10,  2, /**/  3,  4,  9, 11, /**/ 12, 16,  6, 14, /**/ 15, 13,  7,  8},
                 {14, 16,  8, 13, /**/  5, 15,  7, 12, /**/  4,  3,  1,  2, /**/  9, 10,  6, 11},
                 { 4, 12,  9,  7, /**/ 10, 16,  6,  1, /**/  8, 13, 15, 11, /**/  5,  3, 14,  2},
@@ -109,10 +114,11 @@ class IterativeSudokuSolverTest {
                 { 6, 14,  4, 16, /**/  7, 11,  1,  2, /**/  3,  8, 10, 13, /**/ 12,  5,  9, 15}
         };
 
-        sudokuSolver = new IterativeSudokuSolver(new SudokuBoard(initialState));
-        sudokuSolver.solve();
-        SudokuUtil.printSudokuBoard(sudokuSolver.getSudoku().getBoard());
-        assertArrayEquals(expected, sudokuSolver.getSudoku().getBoard());
+        sudokuSolver = new IterativeSudokuSolver();
+        List<Integer[][]> actual = sudokuSolver.solve(initialState);
+        SudokuUtil.printSudokuBoard(actual);
+        assertEquals(1, actual.size());
+        assertArrayEquals(expected, actual.get(0));
     }
 
     @Test
@@ -139,7 +145,7 @@ class IterativeSudokuSolverTest {
                 { 0, 16,  0,  0, /**/  0, 14,  0,  3, /**/  9,  0,  2,  0, /**/  1,  0,  4, 12}
         };
 
-        int[][] expected = {
+        Integer[][] expected = {
                 { 7,  9, 11,  3, /**/  2, 12, 14,  8, /**/  5, 15, 10, 13, /**/  6,  1, 16,  4},
                 {12,  5, 16,  6, /**/  7, 15, 13, 11, /**/  3,  9,  1,  4, /**/ 14, 10,  2,  8},
                 {13, 14,  4,  2, /**/ 10,  9,  1, 16, /**/  8, 11, 12,  6, /**/  7, 15,  3,  5},
@@ -161,10 +167,11 @@ class IterativeSudokuSolverTest {
                 {11, 16, 15,  8, /**/ 13, 14, 10,  3, /**/  9,  6,  2,  7, /**/  1,  5,  4, 12}
         };
 
-        sudokuSolver = new IterativeSudokuSolver(new SudokuBoard(initialState));
-        sudokuSolver.solve();
-        SudokuUtil.printSudokuBoard(sudokuSolver.getSudoku().getBoard());
-        assertArrayEquals(expected, sudokuSolver.getSudoku().getBoard());
+        sudokuSolver = new IterativeSudokuSolver();
+        List<Integer[][]> actual = sudokuSolver.solve(initialState);
+        SudokuUtil.printSudokuBoard(actual);
+        assertEquals(1, actual.size());
+        assertArrayEquals(expected, actual.get(0));
     }
 
     @Test
@@ -192,7 +199,7 @@ class IterativeSudokuSolverTest {
                 { 0,  5,  0,  0, /**/  0,  8,  0,  0, /**/  9,  2,  4,  0, /**/  0,  0, 12, 14}
         };
 
-        int[][] expected = {
+        Integer[][] expected = {
                 { 1,  5, 10,  2, /**/  3,  4,  9, 11, /**/ 12, 16,  6, 14, /**/ 15, 13,  7,  8},
                 {14, 16,  8, 13, /**/  5, 15,  7, 12, /**/  4,  3,  1,  2, /**/  9, 10,  6, 11},
                 { 4, 12,  9,  7, /**/ 10, 16,  6,  1, /**/  8, 13, 15, 11, /**/  5,  3, 14,  2},
@@ -214,10 +221,11 @@ class IterativeSudokuSolverTest {
                 { 6, 14,  4, 16, /**/  7, 11,  1,  2, /**/  3,  8, 10, 13, /**/ 12,  5,  9, 15}
         };
 
-        sudokuSolver = new IterativeSudokuSolver(new SudokuBoard(initialState));
-        sudokuSolver.solve();
-        SudokuUtil.printSudokuBoard(sudokuSolver.getSudoku().getBoard());
-        assertArrayEquals(expected, sudokuSolver.getSudoku().getBoard());
+        sudokuSolver = new IterativeSudokuSolver();
+        List<Integer[][]> actual = sudokuSolver.solve(initialState);
+        SudokuUtil.printSudokuBoard(actual);
+        assertEquals(1, actual.size());
+        assertArrayEquals(expected, actual.get(0));
     }
 
     @Test
@@ -254,7 +262,7 @@ class IterativeSudokuSolverTest {
                 { 0, 21,  3,  0,  0, /**/  0, 17,  0,  0,  0, /**/  0, 15,  0, 25, 20, /**/  0,  0,  4, 10,  0, /**/  0,  0, 16, 11,  0},
                 { 0,  0, 20,  2,  0, /**/ 16,  5,  8,  0,  0, /**/  0,  0,  0,  0,  0, /**/  0,  6,  0, 19, 25, /**/  0,  0,  0,  3,  0}
         };
-        int[][] expected = {
+        Integer[][] expected = {
                 {18,  2, 22, 19,  9, /**/  3, 14, 17,  8, 16, /**/ 15, 23,  5, 20,  6, /**/ 11, 25, 13,  4, 24, /**/ 10,  7,  1, 21, 12},
                 {14, 10, 17, 11,  8, /**/  5,  6, 18, 21,  9, /**/ 22, 16,  4, 12, 24, /**/  2,  7, 23,  1, 20, /**/ 15, 25, 13, 19,  3},
                 {25, 15, 24, 13,  7, /**/ 20,  1, 23,  4, 12, /**/ 10, 11,  8,  3, 14, /**/ 21, 18, 16,  5, 19, /**/ 17, 22,  2,  6,  9},
@@ -286,10 +294,11 @@ class IterativeSudokuSolverTest {
                 {12, 17, 20,  2, 24, /**/ 16,  5,  8, 10, 15, /**/ 18, 13,  1, 11,  9, /**/ 23,  6, 14, 19, 25, /**/ 21,  4, 22,  3,  7}
         };
 
-        sudokuSolver = new IterativeSudokuSolver(new SudokuBoard(initialState));
-        sudokuSolver.solve();
-        SudokuUtil.printSudokuBoard(sudokuSolver.getSudoku().getBoard());
-        assertArrayEquals(expected, sudokuSolver.getSudoku().getBoard());
+        sudokuSolver = new IterativeSudokuSolver();
+        List<Integer[][]> actual = sudokuSolver.solve(initialState);
+        SudokuUtil.printSudokuBoard(actual);
+        assertEquals(1, actual.size());
+        assertArrayEquals(expected, actual.get(0));
     }
 
 }

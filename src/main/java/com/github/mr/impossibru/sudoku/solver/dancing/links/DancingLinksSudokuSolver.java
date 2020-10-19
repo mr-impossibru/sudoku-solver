@@ -4,12 +4,14 @@ import com.github.mr.impossibru.sudoku.solver.SudokuSolver;
 import com.github.mr.impossibru.sudoku.solver.dancing.links.model.DancingNode;
 import com.github.mr.impossibru.sudoku.solver.model.SudokuBoard;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@NoArgsConstructor
 public class DancingLinksSudokuSolver implements SudokuSolver {
 
     @Getter
@@ -26,15 +28,6 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
     private static final int CONSTRAINTS = 4;
 
     /**
-     * Initialize Sudoku Solver based on Algorithm X
-     *
-     * @param board initial Sudoku Board
-     */
-    public DancingLinksSudokuSolver(SudokuBoard board) {
-        this.board = board;
-    }
-
-    /**
      * Solves sudoku using Dancing Links Algorithm
      *
      * @param initialState initial state of sudoku board
@@ -42,11 +35,16 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
      */
     @Override
     public List<Integer[][]> solve(int[][] initialState) {
+        long start = System.currentTimeMillis();
+        this.board = new SudokuBoard(initialState);
         boolean[][] coverBoard = createCoverBoard();
         putInitialStateToCoverBoard(initialState, coverBoard);
 
         DLX dlx = new DLX(coverBoard);
         List<List<DancingNode>> dancingNodes = dlx.runAlgorithmX();
+        long end = System.currentTimeMillis();
+
+        System.out.println("Took " + (end - start) + "ms");
 
         return transformAnswerToSudokuGrid(dancingNodes);
     }
@@ -171,29 +169,32 @@ public class DancingLinksSudokuSolver implements SudokuSolver {
             Integer[][] solvedBoard = new Integer[board.getSide()][board.getSide()];
 
             for (DancingNode node : solution) {
-                DancingNode rcNode = node;
+                DancingNode rowColumnNode = node;
 
-                int min = Integer.parseInt(rcNode.getColumn().getName());
+                int min = Integer.parseInt(rowColumnNode.getColumn().getName());
 
+                //find cell constraint node
                 for (DancingNode rightNode = node.getRight(); rightNode != node; rightNode = rightNode.getRight()) {
                     int value = Integer.parseInt(rightNode.getColumn().getName());
 
                     if (value < min) {
                         min = value;
-                        rcNode = rightNode;
+                        rowColumnNode = rightNode;
                     }
                 }
 
-                //TODO rename
-                int ans1 = Integer.parseInt(rcNode.getColumn().getName());
-                int ans2 = Integer.parseInt(rcNode.getRight().getColumn().getName());
+                // we pick cell constraint node to get row and column index
+                // and row constraint node to get value
+                // for more information print cover board before initial data input
+                int cellConstraintNode = Integer.parseInt(rowColumnNode.getColumn().getName());
+                int rowConstrainIndex = Integer.parseInt(rowColumnNode.getRight().getColumn().getName());
 
-                int rowIndex = ans1 / board.getSide();
-                int colIndex = ans1 % board.getSide();
+                int rowIndex = cellConstraintNode / board.getSide();
+                int colIndex = cellConstraintNode % board.getSide();
 
-                int num = (ans2 % board.getSide()) + 1;
+                int candidate = (rowConstrainIndex % board.getSide()) + 1;
 
-                solvedBoard[rowIndex][colIndex] = num;
+                solvedBoard[rowIndex][colIndex] = candidate;
             }
             result.add(solvedBoard);
         }

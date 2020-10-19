@@ -1,27 +1,54 @@
 package com.github.mr.impossibru.sudoku.solver.iterative;
 
+import com.github.mr.impossibru.sudoku.solver.SudokuSolver;
 import com.github.mr.impossibru.sudoku.solver.model.SudokuBoard;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-public class IterativeSudokuSolver {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+@NoArgsConstructor
+public class IterativeSudokuSolver implements SudokuSolver {
 
     @Getter
     @Setter
     private SudokuBoard sudoku;
 
-    public IterativeSudokuSolver(SudokuBoard sudokuBoard) {
-        this.sudoku = sudokuBoard;
+    @Override
+    public List<Integer[][]> solve(int[][] initialData) {
+        long start = System.currentTimeMillis();
+        sudoku = new SudokuBoard(initialData);
+        if (!solveIteratively()) {
+            return Collections.emptyList();
+        }
+        long end = System.currentTimeMillis();
+
+        System.out.println("Took " + (end - start) + "ms");
+
+        Integer[][] solution = new Integer[sudoku.getSide()][sudoku.getSide()];
+        for (int i = 0; i < sudoku.getSide(); i++) {
+            for (int j = 0; j < sudoku.getSide(); j++) {
+                solution[i][j] = sudoku.getBoard()[i][j];
+            }
+        }
+        List<Integer[][]> result = new ArrayList<>();
+        result.add(solution);
+
+        return result;
     }
 
-    public boolean solve() {
+    //TODO: remove mutation in Sudoku board
+    private boolean solveIteratively() {
         for (int row = 0; row < sudoku.getSide(); row++) {
             for (int column = 0; column < sudoku.getSide(); column++) {
                 if (sudoku.getBoard()[row][column] == 0) {
                     for (int candidate = 1; candidate <= sudoku.getMaxNumber(); candidate++) {
                         if (passConstraints(sudoku.getBoard(), candidate, row, column)) {
                             sudoku.getBoard()[row][column] = candidate;
-                            if (solve()) {
+                            if (solveIteratively()) {
                                 return true;
                             } else {
                                 sudoku.getBoard()[row][column] = 0;
