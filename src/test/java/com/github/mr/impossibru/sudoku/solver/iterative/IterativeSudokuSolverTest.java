@@ -1,16 +1,18 @@
-package com.github.mr.impossibru.sudoku.solver.dancing.links;
+package com.github.mr.impossibru.sudoku.solver.iterative;
 
 import com.github.mr.impossibru.sudoku.solver.SudokuSolver;
 import com.github.mr.impossibru.sudoku.solver.util.SudokuUtil;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DancingLinksSudokuSolverTest {
+class IterativeSudokuSolverTest {
 
-    private SudokuSolver sudokuSolver;
+    SudokuSolver sudokuSolver;
 
     @Test
     void sudoku_4x4_OneSolution() {
@@ -27,62 +29,11 @@ class DancingLinksSudokuSolverTest {
                 {2, 4, 3, 1},
         };
 
-        sudokuSolver = new DancingLinksSudokuSolver();
+        sudokuSolver = new IterativeSudokuSolver();
         List<Integer[][]> actual = sudokuSolver.solve(initialState);
         SudokuUtil.printSudokuBoard(actual);
         assertEquals(1, actual.size());
         assertArrayEquals(expected, actual.get(0));
-    }
-
-    @Test
-    void sudoku_4x4_MultipleSolutions() {
-        int[][] initialState = {
-                {0, 0, 0, 3},
-                {0, 0, 0, 0},
-                {1, 0, 4, 0},
-                {0, 0, 0, 1},
-        };
-        Integer[][] expectedFirst = {
-                {2, 4, 1, 3},
-                {3, 1, 2, 4},
-                {1, 3, 4, 2},
-                {4, 2, 3, 1}
-        };
-        Integer[][] expectedSecond = {
-                {4, 1, 2, 3},
-                {3, 2, 1, 4},
-                {1, 3, 4, 2},
-                {2, 4, 3, 1}
-        };
-        Integer[][] expectedThird = {
-                {4, 2, 1, 3},
-                {3, 1, 2, 4},
-                {1, 3, 4, 2},
-                {2, 4, 3, 1}
-        };
-
-        sudokuSolver = new DancingLinksSudokuSolver();
-        List<Integer[][]> actual = sudokuSolver.solve(initialState);
-        SudokuUtil.printSudokuBoard(actual);
-        assertEquals(3, actual.size());
-        assertArrayEquals(expectedFirst, actual.get(0));
-        assertArrayEquals(expectedSecond, actual.get(1));
-        assertArrayEquals(expectedThird, actual.get(2));
-    }
-
-    @Test
-    void sudoku_4x4_AllCombinations() {
-        int[][] initialState = {
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
-        };
-
-        sudokuSolver = new DancingLinksSudokuSolver();
-        List<Integer[][]> actual = sudokuSolver.solve(initialState);
-        assertEquals(288, actual.size());
-        SudokuUtil.printSudokuBoard(actual);
     }
 
     @Test
@@ -110,7 +61,7 @@ class DancingLinksSudokuSolverTest {
                 {7, 9, 6, 3, 1, 8, 4, 5, 2}
         };
 
-        sudokuSolver = new DancingLinksSudokuSolver();
+        sudokuSolver = new IterativeSudokuSolver();
         List<Integer[][]> actual = sudokuSolver.solve(initialState);
         SudokuUtil.printSudokuBoard(actual);
         assertEquals(1, actual.size());
@@ -140,7 +91,7 @@ class DancingLinksSudokuSolverTest {
                 {11,  1, 15,  9, /**/  0,  0, 13,  0, /**/  0,  2,  5,  0, /**/  0, 14,  0, 10},
                 { 6, 14,  0,  0, /**/  0, 11,  0,  2, /**/  0,  8,  0, 13, /**/ 12,  0,  0, 15},
         };
-        
+
         Integer[][] expected = {
                 { 1,  5, 10,  2, /**/  3,  4,  9, 11, /**/ 12, 16,  6, 14, /**/ 15, 13,  7,  8},
                 {14, 16,  8, 13, /**/  5, 15,  7, 12, /**/  4,  3,  1,  2, /**/  9, 10,  6, 11},
@@ -163,7 +114,7 @@ class DancingLinksSudokuSolverTest {
                 { 6, 14,  4, 16, /**/  7, 11,  1,  2, /**/  3,  8, 10, 13, /**/ 12,  5,  9, 15}
         };
 
-        sudokuSolver = new DancingLinksSudokuSolver();
+        sudokuSolver = new IterativeSudokuSolver();
         List<Integer[][]> actual = sudokuSolver.solve(initialState);
         SudokuUtil.printSudokuBoard(actual);
         assertEquals(1, actual.size());
@@ -171,57 +122,7 @@ class DancingLinksSudokuSolverTest {
     }
 
     @Test
-    void sudoku_16x16_hard_OneSolution() {
-        int[][] initialState = {
-                { 1,  8,  0,  0, /**/ 14,  0,  0,  4, /**/  0, 16,  0,  0, /**/  2,  0,  0,  7},
-                { 0,  0, 14, 13, /**/  0,  0,  3,  6, /**/  0, 10,  0,  0, /**/  0,  0, 16,  0},
-                {12,  0,  0,  9, /**/ 15,  0, 10,  0, /**/  0,  0,  3,  0, /**/  0,  4,  0,  0},
-                { 0, 10,  3,  0, /**/  0,  0,  2,  0, /**/  0, 14,  9, 13, /**/ 11,  0,  0,  0},
-
-                { 0, 14,  0, 11, /**/  7,  5,  0, 10, /**/  0,  3,  0,  0, /**/  8,  0,  0,  0},
-                { 9,  3, 12,  0, /**/  0,  0,  0,  0, /**/  0,  0,  0,  0, /**/  0, 15,  7,  0},
-                { 2,  0,  0,  0, /**/  0,  0,  0,  0, /**/ 16,  0,  7,  0, /**/  0,  6,  0, 13},
-                { 0,  0, 13,  5, /**/  0,  0,  0,  3, /**/  0,  0, 12, 11, /**/  0,  0, 14,  0},
-
-                { 0,  0,  0,  0, /**/ 11, 12,  0,  0, /**/  5, 15,  0,  0, /**/  0, 13,  0, 10},
-                { 0,  0,  0,  0, /**/  0, 14,  5,  9, /**/  0,  0,  8,  0, /**/  0, 11,  0,  0},
-                {15,  0, 16,  2, /**/  0,  7,  4,  0, /**/  0, 12,  0,  0, /**/  0,  0,  0,  6},
-                { 0,  0,  1,  0, /**/  0,  0,  6, 13, /**/  0,  0,  0,  0, /**/  9,  0,  0, 12},
-
-                { 0,  6,  0,  0, /**/  1,  0, 13,  0, /**/ 11,  0,  0, 16, /**/ 15,  0,  0,  0},
-                { 0,  0,  0, 16, /**/  0,  4,  0,  0, /**/  0,  5,  0, 15, /**/  0,  0,  0,  3},
-                {14,  0,  0,  1, /**/  2,  0, 11,  0, /**/  0,  0,  0,  0, /**/  5,  0,  0,  8},
-                { 0,  5,  0,  0, /**/  0,  8,  0,  0, /**/  9,  2,  4,  0, /**/  0,  0, 12, 14}
-        };
-
-        Integer[][] expected = {
-                { 1,  8, 15, 6, 14, 13, 9, 4, 12, 16, 11, 5, 2, 3, 10, 7},
-                {11,  2, 14, 13, 8, 1, 3, 6, 4, 10, 15, 7, 12, 9, 16, 5},
-                {12, 16,  5, 9, 15, 11, 10, 7, 2, 8, 3, 6, 14, 4, 13, 1},
-                { 4, 10,  3, 7, 5, 16, 2, 12, 1, 14, 9, 13, 11, 8, 6, 15},
-                {16, 14,  6, 11, 7, 5, 15, 10, 13, 3, 2, 4, 8, 12, 1, 9},
-                { 9,  3, 12, 8, 13, 2, 16, 1, 10, 6, 5, 14, 4, 15, 7, 11},
-                { 2, 15, 10, 4, 12, 9, 14, 11, 16, 1, 7, 8, 3, 6, 5, 13},
-                { 7,  1, 13, 5, 4, 6, 8, 3, 15, 9, 12, 11, 10, 2, 14, 16},
-                { 6,  9,  8, 14, 11, 12, 1, 2, 5, 15, 16, 3, 7, 13, 4, 10},
-                {13, 12,  7, 10, 3, 14, 5, 9, 6, 4, 8, 1, 16, 11, 15, 2},
-                {15, 11, 16, 2, 10, 7, 4, 8, 14, 12, 13, 9, 1, 5, 3, 6},
-                { 5,  4,  1, 3, 16, 15, 6, 13, 7, 11, 10, 2, 9, 14, 8, 12},
-                { 8,  6,  9, 12, 1, 3, 13, 5, 11, 7, 14, 16, 15, 10, 2, 4},
-                {10, 13,  2, 16, 9, 4, 12, 14, 8, 5, 1, 15, 6, 7, 11, 3},
-                {14,  7,  4, 1, 2, 10, 11, 15, 3, 13, 6, 12, 5, 16, 9, 8},
-                { 3,  5, 11, 15, 6, 8, 7, 16, 9, 2, 4, 10, 13, 1, 12, 14},
-        };
-
-        sudokuSolver = new DancingLinksSudokuSolver();
-        List<Integer[][]> actual = sudokuSolver.solve(initialState);
-        SudokuUtil.printSudokuBoard(actual);
-        assertEquals(1, actual.size());
-        assertArrayEquals(expected, actual.get(0));
-    }
-
-    @Test
-    void sudoku_16x16_medium_MultipleSolutions() {
+    void sudoku_16x16_medium_OneSolution() {
         int[][] initialState = {
                 { 0,  0,  0,  0, /**/  0, 12,  0,  8, /**/  0, 15,  0, 13, /**/  6,  0,  0,  4},
                 {12,  5, 16,  0, /**/  0, 15, 13, 11, /**/  0,  0,  0,  0, /**/  0, 10,  2,  0},
@@ -266,14 +167,69 @@ class DancingLinksSudokuSolverTest {
                 {11, 16, 15,  8, /**/ 13, 14, 10,  3, /**/  9,  6,  2,  7, /**/  1,  5,  4, 12}
         };
 
-        sudokuSolver = new DancingLinksSudokuSolver();
+        sudokuSolver = new IterativeSudokuSolver();
         List<Integer[][]> actual = sudokuSolver.solve(initialState);
         SudokuUtil.printSudokuBoard(actual);
+        assertEquals(1, actual.size());
         assertArrayEquals(expected, actual.get(0));
     }
 
+    @Test
+    @Disabled("Executes too long")
+    void sudoku_16x16_hard_OneSolution() {
+        int[][] initialState = {
+                { 1,  8,  0,  0, /**/ 14,  0,  0,  4, /**/  0, 16,  0,  0, /**/  2,  0,  0,  7},
+                { 0,  0, 14, 13, /**/  0,  0,  3,  6, /**/  0, 10,  0,  0, /**/  0,  0, 16,  0},
+                {12,  0,  0,  9, /**/ 15,  0, 10,  0, /**/  0,  0,  3,  0, /**/  0,  4,  0,  0},
+                { 0, 10,  3,  0, /**/  0,  0,  2,  0, /**/  0, 14,  9, 13, /**/ 11,  0,  0,  0},
+
+                { 0, 14,  0, 11, /**/  7,  5,  0, 10, /**/  0,  3,  0,  0, /**/  8,  0,  0,  0},
+                { 9,  3, 12,  0, /**/  0,  0,  0,  0, /**/  0,  0,  0,  0, /**/  0, 15,  7,  0},
+                { 2,  0,  0,  0, /**/  0,  0,  0,  0, /**/ 16,  0,  7,  0, /**/  0,  6,  0, 13},
+                { 0,  0, 13,  5, /**/  0,  0,  0,  3, /**/  0,  0, 12, 11, /**/  0,  0, 14,  0},
+
+                { 0,  0,  0,  0, /**/ 11, 12,  0,  0, /**/  5, 15,  0,  0, /**/  0, 13,  0, 10},
+                { 0,  0,  0,  0, /**/  0, 14,  5,  9, /**/  0,  0,  8,  0, /**/  0, 11,  0,  0},
+                {15,  0, 16,  2, /**/  0,  7,  4,  0, /**/  0, 12,  0,  0, /**/  0,  0,  0,  6},
+                { 0,  0,  1,  0, /**/  0,  0,  6, 13, /**/  0,  0,  0,  0, /**/  9,  0,  0, 12},
+
+                { 0,  6,  0,  0, /**/  1,  0, 13,  0, /**/ 11,  0,  0, 16, /**/ 15,  0,  0,  0},
+                { 0,  0,  0, 16, /**/  0,  4,  0,  0, /**/  0,  5,  0, 15, /**/  0,  0,  0,  3},
+                {14,  0,  0,  1, /**/  2,  0, 11,  0, /**/  0,  0,  0,  0, /**/  5,  0,  0,  8},
+                { 0,  5,  0,  0, /**/  0,  8,  0,  0, /**/  9,  2,  4,  0, /**/  0,  0, 12, 14}
+        };
+
+        Integer[][] expected = {
+                { 1,  5, 10,  2, /**/  3,  4,  9, 11, /**/ 12, 16,  6, 14, /**/ 15, 13,  7,  8},
+                {14, 16,  8, 13, /**/  5, 15,  7, 12, /**/  4,  3,  1,  2, /**/  9, 10,  6, 11},
+                { 4, 12,  9,  7, /**/ 10, 16,  6,  1, /**/  8, 13, 15, 11, /**/  5,  3, 14,  2},
+                { 3,  6, 11, 15, /**/  2, 13,  8, 14, /**/ 10,  5,  7,  9, /**/  4, 16, 12,  1},
+
+                {13,  4, 14,  3, /**/  8,  7, 11, 10, /**/  5, 12,  2,  6, /**/  1, 15, 16,  9},
+                { 8, 11,  7,  6, /**/  4,  1,  2, 16, /**/  9, 10, 14, 15, /**/  3, 12,  5, 13},
+                {12,  9,  1, 10, /**/ 13,  5, 15,  3, /**/  7,  4, 16,  8, /**/ 14,  2, 11,  6},
+                {16, 15,  2,  5, /**/  9, 12, 14,  6, /**/  1, 11, 13,  3, /**/ 10,  4,  8,  7},
+
+                { 7,  2, 16, 14, /**/ 11,  9,  4, 13, /**/ 15,  1, 12,  5, /**/  8,  6, 10,  3},
+                { 9, 13,  6,  1, /**/ 15,  2,  3,  5, /**/ 11, 14,  8, 10, /**/ 16,  7,  4, 12},
+                { 5,  8,  3, 11, /**/  1, 10, 12,  7, /**/  2,  6,  4, 16, /**/ 13,  9, 15, 14},
+                {15, 10, 12,  4, /**/ 14,  6, 16,  8, /**/ 13,  9,  3,  7, /**/  2, 11,  1,  5},
+
+                { 2,  3,  5,  8, /**/ 12, 14, 10, 15, /**/  6,  7,  9,  4, /**/ 11,  1, 13, 16},
+                {10,  7, 13, 12, /**/ 16,  3,  5,  9, /**/ 14, 15, 11,  1, /**/  6,  8,  2,  4},
+                {11,  1, 15,  9, /**/  6,  8, 13,  4, /**/ 16,  2,  5, 12, /**/  7, 14,  3, 10},
+                { 6, 14,  4, 16, /**/  7, 11,  1,  2, /**/  3,  8, 10, 13, /**/ 12,  5,  9, 15}
+        };
+
+        sudokuSolver = new IterativeSudokuSolver();
+        List<Integer[][]> actual = sudokuSolver.solve(initialState);
+        SudokuUtil.printSudokuBoard(actual);
+        assertEquals(1, actual.size());
+        assertArrayEquals(expected, actual.get(0));
+    }
 
     @Test
+    @Disabled("Executes too long")
     void sudoku_25x25_OneSolution() {
         int[][] initialState = {
                 { 0,  2,  0,  0,  0, /**/  3, 14,  0,  8,  0, /**/  0,  0,  0,  0,  0, /**/  0,  0, 13,  4, 24, /**/  0,  7,  1,  0,  0},
@@ -338,7 +294,7 @@ class DancingLinksSudokuSolverTest {
                 {12, 17, 20,  2, 24, /**/ 16,  5,  8, 10, 15, /**/ 18, 13,  1, 11,  9, /**/ 23,  6, 14, 19, 25, /**/ 21,  4, 22,  3,  7}
         };
 
-        sudokuSolver = new DancingLinksSudokuSolver();
+        sudokuSolver = new IterativeSudokuSolver();
         List<Integer[][]> actual = sudokuSolver.solve(initialState);
         SudokuUtil.printSudokuBoard(actual);
         assertEquals(1, actual.size());

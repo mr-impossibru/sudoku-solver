@@ -1,9 +1,9 @@
-package com.github.mr.impossibru.sudoku.solver;
+package com.github.mr.impossibru.sudoku.solver.util;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class Util {
+public class SudokuUtil {
 
     public static void printSudokuBoard(List<Integer[][]> solutions) {
         System.out.println("Total solutions - " + solutions.size());
@@ -13,5 +13,11 @@ public class Util {
                 System.out.println(Arrays.toString(row));
             }
         }
+    }
+
+    public static void printSudokuBoard(int[][] solution) {
+            for (int[] row : solution) {
+                System.out.println(Arrays.toString(row));
+            }
     }
 }
